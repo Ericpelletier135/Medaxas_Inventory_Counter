@@ -31,7 +31,7 @@ export default function LoginPage() {
       const data = await res.json();
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
-      router.push("/");
+      router.push("/dashboard");
     } catch {
       setError("Network error");
     }
@@ -45,44 +45,63 @@ export default function LoginPage() {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
+        backgroundColor: "var(--background)",
       }}
     >
-      <h1>Login</h1>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "0.75rem", width: "320px" }}
-      >
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-        />
-        <button
-          type="submit"
-          style={{
-            padding: "0.75rem",
-            background: "#0070f3",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Sign In
-        </button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </form>
+      <div className="card" style={{ width: "100%", maxWidth: "400px" }}>
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <h1 style={{ color: "var(--primary)", fontSize: "1.75rem", fontWeight: 700 }}>
+            Medaxas
+          </h1>
+          <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem", fontSize: "0.95rem" }}>
+            Sign in to your account
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <label style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-primary)" }}>
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="input-field"
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <label style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-primary)" }}>
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input-field"
+            />
+          </div>
+
+          {error && (
+            <p style={{ color: "var(--danger)", fontSize: "0.875rem", textAlign: "center" }}>
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="btn-primary"
+            style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem" }}
+          >
+            Sign In
+          </button>
+        </form>
+      </div>
     </main>
   );
 }

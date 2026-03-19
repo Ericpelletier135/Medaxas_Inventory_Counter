@@ -56,6 +56,12 @@ app.include_router(auth_router)
 app.include_router(vendors_router)
 app.include_router(items_router)
 
+from app.api.stock_counts import router as stock_counts_router
+from app.api.sales_orders import router as sales_orders_router
+
+app.include_router(stock_counts_router)
+app.include_router(sales_orders_router)
+
 
 @app.get("/")
 async def root():
