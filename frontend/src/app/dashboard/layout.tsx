@@ -27,7 +27,7 @@ const styles = {
   },
   main: {
     flex: 1,
-    marginLeft: "250px", /* Match sidebar width */
+    marginLeft: "250px",
     padding: "2rem",
   },
   contentContainer: {

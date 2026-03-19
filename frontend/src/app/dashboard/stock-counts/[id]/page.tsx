@@ -32,13 +32,12 @@ type StockCountSession = {
 export default function StockCountDetailPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  
+
   const [session, setSession] = useState<StockCountSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
   const [generating, setGenerating] = useState(false);
-  
-  // Local state for instant UI feedback before auto-save completes
+
   const [localCounts, setLocalCounts] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -47,8 +46,7 @@ export default function StockCountDetailPage() {
       if (res.ok) {
         const data = await res.json();
         setSession(data);
-        
-        // Initialize local counts
+
         const initialCounts: Record<string, string> = {};
         data.stock_count_lines.forEach((line: StockCountLine) => {
           initialCounts[line.stock_count_line_id] = line.counted_quantity !== null ? String(line.counted_quantity) : "";
@@ -61,7 +59,6 @@ export default function StockCountDetailPage() {
   }, [id]);
 
   const handleCountChange = (lineId: string, value: string) => {
-    // Only allow numbers
     if (value !== "" && !/^\d+$/.test(value)) return;
     setLocalCounts((prev) => ({ ...prev, [lineId]: value }));
   };
@@ -69,17 +66,16 @@ export default function StockCountDetailPage() {
   const handleBlurSave = async (lineId: string) => {
     if (!session) return;
     const value = localCounts[lineId];
-    if (value === "") return; // Don't save empty strings; they represent uncounted
+    if (value === "") return;
 
     const numValue = parseInt(value, 10);
-    
-    // Optimistically update the session object so progress bar updates instantly
+
     setSession((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        stock_count_lines: prev.stock_count_lines.map(line => 
-          line.stock_count_line_id === lineId 
+        stock_count_lines: prev.stock_count_lines.map(line =>
+          line.stock_count_line_id === lineId
             ? { ...line, counted_quantity: numValue, variance: numValue - line.previous_quantity }
             : line
         )
@@ -91,8 +87,6 @@ export default function StockCountDetailPage() {
         method: "PATCH",
         body: JSON.stringify({ counted_quantity: numValue })
       });
-      // We don't necessarily need to refresh the whole session here unless we want perfect sync,
-      // the optimistic update handles the UI side perfectly well.
     } catch {
       alert("Failed to save count. Check connection.");
     }
@@ -100,7 +94,7 @@ export default function StockCountDetailPage() {
 
   const handleComplete = async () => {
     if (!confirm("Are you sure? This will update the live inventory quantities.")) return;
-    
+
     setCompleting(true);
     try {
       const res = await fetchWithAuth(`/api/stock-count-sessions/${id}/complete`, {
@@ -150,10 +144,9 @@ export default function StockCountDetailPage() {
   if (!session) return <div>Session not found.</div>;
 
   const totalLines = session.stock_count_lines.length;
-  // Calculate completed lines based on local optimistic state rather than just pure backend state
   const completedLines = session.stock_count_lines.filter(l => l.counted_quantity !== null).length;
   const progressPercent = totalLines === 0 ? 100 : Math.round((completedLines / totalLines) * 100);
-  
+
   const isCompleted = session.status === "completed";
   const canComplete = completedLines === totalLines && !isCompleted && totalLines > 0;
 
@@ -168,12 +161,12 @@ export default function StockCountDetailPage() {
             Date: {session.count_date} | Items: {totalLines}
           </p>
         </div>
-        
+
         <div style={{ display: "flex", gap: "1rem" }}>
           {!isCompleted ? (
-            <button 
-              className="btn-primary" 
-              onClick={handleComplete} 
+            <button
+              className="btn-primary"
+              onClick={handleComplete}
               disabled={!canComplete || completing}
               title={!canComplete ? "You must count all items before completing." : ""}
               style={{ backgroundColor: canComplete ? "var(--success)" : "var(--border)", color: canComplete ? "white" : "var(--text-secondary)" }}
@@ -192,7 +185,6 @@ export default function StockCountDetailPage() {
         </div>
       </div>
 
-      {/* Progress Bar */}
       {!isCompleted && (
         <div className="card" style={{ marginBottom: "2rem", padding: "1.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
@@ -200,13 +192,13 @@ export default function StockCountDetailPage() {
             <span style={{ color: "var(--text-secondary)" }}>{completedLines} / {totalLines} items</span>
           </div>
           <div style={{ width: "100%", height: "12px", backgroundColor: "var(--border)", borderRadius: "9999px", overflow: "hidden" }}>
-            <div 
-              style={{ 
-                width: `${progressPercent}%`, 
-                height: "100%", 
+            <div
+              style={{
+                width: `${progressPercent}%`,
+                height: "100%",
                 backgroundColor: progressPercent === 100 ? "var(--success)" : "var(--primary)",
                 transition: "width 0.3s ease, background-color 0.3s ease"
-              }} 
+              }}
             />
           </div>
         </div>

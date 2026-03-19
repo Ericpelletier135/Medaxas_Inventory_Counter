@@ -5,7 +5,6 @@ import uuid
 from pydantic import BaseModel, ConfigDict
 
 
-# --- Nested Item Details (for the frontend counting UI) ---
 class ItemMinimal(BaseModel):
     id: uuid.UUID
     name: str
@@ -16,7 +15,6 @@ class ItemMinimal(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-# --- Stock Count Line ---
 class StockCountLineBase(BaseModel):
     notes: Optional[str] = None
 

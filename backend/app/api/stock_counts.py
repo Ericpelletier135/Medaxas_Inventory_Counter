@@ -191,7 +191,7 @@ async def complete_session(
     if session.status not in ("open", "in_progress"):
         raise HTTPException(status_code=400, detail=f"Session is already {session.status}")
 
-    # THE 'ACCIDENTAL WIPE' GUARD
+    # 'ACCIDENTAL WIPE' GUARD
     uncounted_lines = [line for line in session.stock_count_lines if line.counted_quantity is None]
     if uncounted_lines:
         raise HTTPException(

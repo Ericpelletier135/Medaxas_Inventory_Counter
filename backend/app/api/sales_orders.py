@@ -62,7 +62,7 @@ async def generate_sales_orders(
     
     for line in session.stock_count_lines:
         item = line.item
-        counted_qty = line.counted_quantity or 0  # Should not be null if completed, but safe fallback
+        counted_qty = line.counted_quantity or 0
         
         if counted_qty < item.minimum_quantity:
             vid = item.vendor_id
@@ -71,16 +71,13 @@ async def generate_sales_orders(
             vendor_groups[vid].append(line)
 
     if not vendor_groups:
-        # Returning an empty list with 200 is fine, frontend can show "None needed"
+        # Retur an empty list with 200, frontend can show None needed
         return []
 
     # 4. Generate Orders per Vendor group
     created_orders = []
     today_str = date.today().strftime("%Y%m%d")
 
-    # Get a base count for the day to generate unique SO-YYYYMMDD-XXXX numbers
-    # (Simplified approach: counting existing orders today. 
-    # In strict production, use a dedicated sequence table to prevent race conditions)
     stmt_count = select(func.count(SalesOrder.sales_order_id)).where(SalesOrder.order_date == date.today())
     res_count = await db.execute(stmt_count)
     daily_count = res_count.scalar() or 0
@@ -99,14 +96,13 @@ async def generate_sales_orders(
             total_items=len(lines)
         )
         db.add(new_order)
-        await db.flush()  # to get new_order.sales_order_id
+        await db.flush()
         
         order_lines = []
         for line in lines:
             item = line.item
             counted_qty = line.counted_quantity or 0
             
-            # The calculation rule
             if item.reorder_quantity > 0:
                 quantity_to_order = item.reorder_quantity
             else:

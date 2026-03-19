@@ -8,7 +8,6 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // If we have a token, head straight to the dashboard
     if (localStorage.getItem("access_token")) {
       router.push("/dashboard");
     }
@@ -31,7 +30,7 @@ export default function Home() {
         <h1 style={{ color: "var(--primary)", fontSize: "2.5rem", marginBottom: "0.5rem" }}>Medaxas</h1>
         <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem" }}>by Divocco</p>
       </div>
-      
+
       <p style={{ maxWidth: "500px", textAlign: "center", marginBottom: "1rem" }}>
         Secure inventory counting and sales order automation.
       </p>
