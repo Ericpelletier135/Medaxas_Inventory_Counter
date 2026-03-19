@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://medaxas_user:medaxas_secret_pw@db:5432/medaxas_db?ssl=disable"
+    DATABASE_URL: str = "postgresql+asyncpg://medaxas_user:medaxas_secret_pw@db:5432/medaxas_db"
     SECRET_KEY: str = "change-me-to-a-random-secret-key"
     REFRESH_SECRET_KEY: str = "change-me-to-a-different-random-secret-key"
 
