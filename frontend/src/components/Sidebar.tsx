@@ -7,10 +7,11 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const links = [
-    { name: "Overview", href: "/dashboard" },
-    { name: "Items", href: "/dashboard/items" },
-    { name: "Stock Counts", href: "/dashboard/stock-counts" },
-    { name: "Sales Orders", href: "/dashboard/sales-orders" },
+    { name: "Overview", href: "/dashboard", icon: "📊" },
+    { name: "Vendors", href: "/dashboard/vendors", icon: "🏢" },
+    { name: "Items", href: "/dashboard/items", icon: "📦" },
+    { name: "Stock Counts", href: "/dashboard/stock-counts", icon: "📋" },
+    { name: "Sales Orders", href: "/dashboard/sales-orders", icon: "🛒" },
   ];
 
   return (
@@ -34,8 +35,12 @@ export default function Sidebar() {
               style={{
                 ...styles.link,
                 ...(isActive ? styles.linkActive : {}),
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem"
               }}
             >
+              <span style={{ fontSize: "1.1rem" }}>{link.icon}</span>
               {link.name}
             </Link>
           );
