@@ -9,6 +9,8 @@ export default function Sidebar() {
   const links = [
     { name: "Overview", href: "/dashboard" },
     { name: "Stock Counts", href: "/dashboard/stock-counts" },
+    { name: "Items", href: "/dashboard/items" },
+    { name: "Vendors", href: "/dashboard/vendors" },
     { name: "Sales Orders", href: "/dashboard/sales-orders" },
   ];
 
