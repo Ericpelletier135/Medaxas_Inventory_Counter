@@ -167,6 +167,16 @@ tr:hover {
   color: #991b1b;
 }
 
+.badge-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-inactive {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
 .input-field {
   width: 100%;
   padding: 0.5rem;
