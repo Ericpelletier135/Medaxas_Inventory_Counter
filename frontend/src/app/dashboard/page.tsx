@@ -8,6 +8,12 @@ export default function DashboardOverview() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
         <div className="card">
+          <h3 style={{ marginBottom: "1rem" }}>Items</h3>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Create and manage your item catalogue.</p>
+          <a href="/dashboard/items" className="btn-primary">Manage Items</a>
+        </div>
+
+        <div className="card">
           <h3 style={{ marginBottom: "1rem" }}>Stock Counts</h3>
           <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Manage physical inventory counts.</p>
           <a href="/dashboard/stock-counts" className="btn-primary">View Sessions</a>
