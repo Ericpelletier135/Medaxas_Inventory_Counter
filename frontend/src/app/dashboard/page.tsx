@@ -14,6 +14,12 @@ export default function DashboardOverview() {
         </div>
 
         <div className="card">
+          <h3 style={{ marginBottom: "1rem" }}>Vendors</h3>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Manage your list of suppliers and contacts.</p>
+          <a href="/dashboard/vendors" className="btn-primary">Manage Vendors</a>
+        </div>
+
+        <div className="card">
           <h3 style={{ marginBottom: "1rem" }}>Stock Counts</h3>
           <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Manage physical inventory counts.</p>
           <a href="/dashboard/stock-counts" className="btn-primary">View Sessions</a>
