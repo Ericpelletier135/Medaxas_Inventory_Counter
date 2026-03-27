@@ -4,12 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.auth import current_active_user
 from app.db.session import get_async_session
 from app.models.vendor import Vendor
 from app.schemas.vendor import VendorCreate, VendorRead, VendorUpdate
 
 
-router = APIRouter(prefix="/api/vendors", tags=["vendors"])
+router = APIRouter(
+    prefix="/api/vendors",
+    tags=["vendors"],
+    dependencies=[Depends(current_active_user)],
+)
 
 
 @router.post(

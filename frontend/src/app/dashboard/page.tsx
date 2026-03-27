@@ -24,6 +24,22 @@ export default function DashboardOverview() {
           <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Manage physical inventory counts.</p>
           <a href="/dashboard/stock-counts" className="btn-primary">View Sessions</a>
         </div>
+
+        <div className="card">
+          <h3 style={{ marginBottom: "1rem" }}>Items</h3>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
+            Manage inventory levels and item status.
+          </p>
+          <a href="/dashboard/items" className="btn-primary">Manage Items</a>
+        </div>
+
+        <div className="card">
+          <h3 style={{ marginBottom: "1rem" }}>Vendors</h3>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
+            Manage suppliers and linked inventory items.
+          </p>
+          <a href="/dashboard/vendors" className="btn-primary">Manage Vendors</a>
+        </div>
         
         <div className="card">
           <h3 style={{ marginBottom: "1rem" }}>Sales Orders</h3>
