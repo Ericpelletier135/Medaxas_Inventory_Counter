@@ -132,3 +132,21 @@ async def refresh_access_token(
 # --------------- helper: current active user dependency ---------------
 
 current_active_user = fastapi_users.current_user(active=True)
+
+
+async def current_admin_user(
+    user: User = Depends(current_active_user),
+) -> User:
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="ADMIN_REQUIRED",
+        )
+    return user
+
+
+@router.get("/me", response_model=UserRead)
+async def get_current_user_me(
+    user: User = Depends(current_active_user),
+):
+    return user

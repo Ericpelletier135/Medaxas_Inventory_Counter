@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import current_active_user
 from app.db.session import get_async_session
+from app.models.user import User
 from app.models.vendor import Vendor
 from app.schemas.vendor import VendorCreate, VendorRead, VendorUpdate
 
@@ -25,8 +26,12 @@ router = APIRouter(
 async def create_vendor(
     vendor_in: VendorCreate,
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user),
 ):
-    query = select(Vendor).where(Vendor.vendor_name == vendor_in.vendor_name)
+    query = select(Vendor).where(
+        Vendor.owner_user_id == current_user.id,
+        Vendor.vendor_name == vendor_in.vendor_name,
+    )
     result = await session.execute(query)
     existing = result.scalars().first()
     if existing:
@@ -36,6 +41,7 @@ async def create_vendor(
         )
 
     vendor = Vendor(
+        owner_user_id=current_user.id,
         vendor_name=vendor_in.vendor_name,
         contact_name=vendor_in.contact_name,
         email=vendor_in.email,
@@ -53,8 +59,13 @@ async def create_vendor(
 @router.get("", response_model=List[VendorRead])
 async def list_vendors(
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user),
 ):
-    result = await session.execute(select(Vendor))
+    result = await session.execute(
+        select(Vendor)
+        .where(Vendor.owner_user_id == current_user.id)
+        .order_by(Vendor.created_at.desc())
+    )
     vendors = result.scalars().all()
     return vendors
 
@@ -63,9 +74,13 @@ async def list_vendors(
 async def get_vendor(
     vendor_id: str,
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user),
 ):
     result = await session.execute(
-        select(Vendor).where(Vendor.vendor_id == vendor_id)
+        select(Vendor).where(
+            Vendor.vendor_id == vendor_id,
+            Vendor.owner_user_id == current_user.id,
+        )
     )
     vendor = result.scalars().first()
     if not vendor:
@@ -81,9 +96,13 @@ async def update_vendor(
     vendor_id: str,
     vendor_in: VendorUpdate,
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user),
 ):
     result = await session.execute(
-        select(Vendor).where(Vendor.vendor_id == vendor_id)
+        select(Vendor).where(
+            Vendor.vendor_id == vendor_id,
+            Vendor.owner_user_id == current_user.id,
+        )
     )
     vendor = result.scalars().first()
     if not vendor:
@@ -96,7 +115,10 @@ async def update_vendor(
 
     new_name = update_data.get("vendor_name")
     if new_name and new_name != vendor.vendor_name:
-        query = select(Vendor).where(Vendor.vendor_name == new_name)
+        query = select(Vendor).where(
+            Vendor.owner_user_id == current_user.id,
+            Vendor.vendor_name == new_name,
+        )
         result = await session.execute(query)
         existing = result.scalars().first()
         if existing:
@@ -121,9 +143,13 @@ async def update_vendor(
 async def delete_vendor(
     vendor_id: str,
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user),
 ):
     result = await session.execute(
-        select(Vendor).where(Vendor.vendor_id == vendor_id)
+        select(Vendor).where(
+            Vendor.vendor_id == vendor_id,
+            Vendor.owner_user_id == current_user.id,
+        )
     )
     vendor = result.scalars().first()
     if not vendor:

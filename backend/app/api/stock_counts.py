@@ -38,7 +38,10 @@ async def create_stock_count_session(
     Snapshots all active items into StockCountLines.
     """
     # 1. Fetch all active items
-    stmt = select(Item).where(Item.status == "active")
+    stmt = select(Item).where(
+        Item.status == "active",
+        Item.owner_user_id == current_user.id,
+    )
     result = await db.execute(stmt)
     active_items = result.scalars().all()
 
@@ -76,7 +79,11 @@ async def create_stock_count_session(
     await db.refresh(new_session)
 
     # Reload the relationships to return the full read model
-    return await get_session_with_relations(db, new_session.stock_count_session_id)
+    return await get_session_with_relations(
+        db,
+        new_session.stock_count_session_id,
+        created_by_user_id=current_user.id,
+    )
 
 
 @router.get("", response_model=List[StockCountSessionRead])
@@ -86,7 +93,11 @@ async def list_stock_count_sessions(
     current_user: User = Depends(current_active_user),
 ):
     """List all sessions. Optionally filter by status."""
-    return await get_all_sessions_with_relations(db, status_filter)
+    return await get_all_sessions_with_relations(
+        db,
+        status_filter,
+        created_by_user_id=current_user.id,
+    )
 
 
 @router.get("/{session_id}", response_model=StockCountSessionRead)
@@ -96,7 +107,11 @@ async def get_stock_count_session(
     current_user: User = Depends(current_active_user),
 ):
     """Get a specific session and all its lines."""
-    session = await get_session_with_relations(db, session_id)
+    session = await get_session_with_relations(
+        db,
+        session_id,
+        created_by_user_id=current_user.id,
+    )
     
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -121,7 +136,10 @@ async def update_count_line(
         raise HTTPException(status_code=422, detail="Counted quantity cannot be negative")
 
     # Fetch Session
-    stmt_session = select(StockCountSession).where(StockCountSession.stock_count_session_id == session_id)
+    stmt_session = select(StockCountSession).where(
+        StockCountSession.stock_count_session_id == session_id,
+        StockCountSession.created_by_user_id == current_user.id,
+    )
     result_session = await db.execute(stmt_session)
     session = result_session.scalars().first()
 
@@ -180,7 +198,10 @@ async def complete_session(
     stmt = (
         select(StockCountSession)
         .options(selectinload(StockCountSession.stock_count_lines))
-        .where(StockCountSession.stock_count_session_id == session_id)
+        .where(
+            StockCountSession.stock_count_session_id == session_id,
+            StockCountSession.created_by_user_id == current_user.id,
+        )
     )
     result = await db.execute(stmt)
     session = result.scalars().first()
@@ -214,4 +235,8 @@ async def complete_session(
     await db.commit()
     
     # Reload for full response
-    return await get_session_with_relations(db, session_id)
+    return await get_session_with_relations(
+        db,
+        session_id,
+        created_by_user_id=current_user.id,
+    )

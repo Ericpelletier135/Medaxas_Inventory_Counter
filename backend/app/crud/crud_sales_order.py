@@ -10,7 +10,9 @@ from app.models.sales_order_line import SalesOrderLine
 
 
 async def get_sales_order_with_relations(
-    db: AsyncSession, order_id: uuid.UUID
+    db: AsyncSession,
+    order_id: uuid.UUID,
+    created_by_user_id: uuid.UUID | None = None,
 ) -> Optional[SalesOrder]:
     """Retrieve a Sales Order fully populated with its lines and items."""
     stmt = (
@@ -20,6 +22,8 @@ async def get_sales_order_with_relations(
         )
         .where(SalesOrder.sales_order_id == order_id)
     )
+    if created_by_user_id:
+        stmt = stmt.where(SalesOrder.created_by_user_id == created_by_user_id)
     result = await db.execute(stmt)
     return result.scalars().first()
 
@@ -40,7 +44,10 @@ async def get_sales_orders_by_ids(
     return result.scalars().all()
 
 
-async def get_all_sales_orders(db: AsyncSession) -> List[SalesOrder]:
+async def get_all_sales_orders(
+    db: AsyncSession,
+    created_by_user_id: uuid.UUID | None = None,
+) -> List[SalesOrder]:
     """Retrieve all Sales Orders fully populated."""
     stmt = (
         select(SalesOrder)
@@ -49,5 +56,7 @@ async def get_all_sales_orders(db: AsyncSession) -> List[SalesOrder]:
         )
         .order_by(SalesOrder.created_at.desc())
     )
+    if created_by_user_id:
+        stmt = stmt.where(SalesOrder.created_by_user_id == created_by_user_id)
     result = await db.execute(stmt)
     return result.scalars().all()

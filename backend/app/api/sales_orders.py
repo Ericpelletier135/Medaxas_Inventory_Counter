@@ -37,7 +37,11 @@ async def generate_sales_orders(
     Only orders items where counted_quantity < minimum_quantity.
     """
     # 1. Fetch the Session
-    session = await get_session_with_relations(db, session_id)
+    session = await get_session_with_relations(
+        db,
+        session_id,
+        created_by_user_id=current_user.id,
+    )
 
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -136,7 +140,7 @@ async def list_sales_orders(
     current_user: User = Depends(current_active_user),
 ):
     """List all sales orders."""
-    return await get_all_sales_orders(db)
+    return await get_all_sales_orders(db, created_by_user_id=current_user.id)
 
 
 @router.get("/{order_id}", response_model=SalesOrderRead)
@@ -146,7 +150,11 @@ async def get_sales_order(
     current_user: User = Depends(current_active_user),
 ):
     """Get a specific sales order."""
-    order = await get_sales_order_with_relations(db, order_id)
+    order = await get_sales_order_with_relations(
+        db,
+        order_id,
+        created_by_user_id=current_user.id,
+    )
     
     if not order:
         raise HTTPException(status_code=404, detail="Sales Order not found")

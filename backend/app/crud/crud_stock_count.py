@@ -10,7 +10,9 @@ from app.models.stock_count_line import StockCountLine
 
 
 async def get_session_with_relations(
-    db: AsyncSession, session_id: uuid.UUID
+    db: AsyncSession,
+    session_id: uuid.UUID,
+    created_by_user_id: uuid.UUID | None = None,
 ) -> Optional[StockCountSession]:
     """Retrieve a Stock Count Session fully populated with its lines and items."""
     stmt = (
@@ -20,12 +22,16 @@ async def get_session_with_relations(
         )
         .where(StockCountSession.stock_count_session_id == session_id)
     )
+    if created_by_user_id:
+        stmt = stmt.where(StockCountSession.created_by_user_id == created_by_user_id)
     result = await db.execute(stmt)
     return result.scalars().first()
 
 
 async def get_all_sessions_with_relations(
-    db: AsyncSession, status_filter: Optional[str] = None
+    db: AsyncSession,
+    status_filter: Optional[str] = None,
+    created_by_user_id: uuid.UUID | None = None,
 ) -> List[StockCountSession]:
     """Retrieve all Stock Count Sessions fully populated, optionally filtered by status."""
     stmt = (
@@ -38,6 +44,8 @@ async def get_all_sessions_with_relations(
     
     if status_filter:
         stmt = stmt.where(StockCountSession.status == status_filter)
+    if created_by_user_id:
+        stmt = stmt.where(StockCountSession.created_by_user_id == created_by_user_id)
         
     result = await db.execute(stmt)
     return result.scalars().all()

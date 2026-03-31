@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 type Session = {
   stock_count_session_id: string;
   count_date: string;
-  status: str;
+  status: string;
   created_at: string;
   stock_count_lines: any[];
 };

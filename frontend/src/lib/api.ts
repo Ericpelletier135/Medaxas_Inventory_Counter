@@ -1,5 +1,20 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+export interface CurrentUser {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  is_admin: boolean;
+  is_active: boolean;
+  status: string;
+}
+
+export function clearAuthTokens() {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+}
+
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   let token = localStorage.getItem("access_token");
 
@@ -30,8 +45,7 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
       });
 
       if (!refreshRes.ok) {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
+        clearAuthTokens();
         window.location.href = "/login";
         return response;
       }
@@ -52,4 +66,10 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
   }
 
   return response;
+}
+
+export async function fetchCurrentUser(): Promise<CurrentUser | null> {
+  const res = await fetchWithAuth("/api/auth/me");
+  if (!res.ok) return null;
+  return res.json();
 }

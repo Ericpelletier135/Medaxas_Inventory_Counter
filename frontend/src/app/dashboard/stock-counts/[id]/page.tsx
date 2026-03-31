@@ -15,7 +15,7 @@ type ItemMinimal = {
 type StockCountLine = {
   stock_count_line_id: string;
   item_id: string;
-  previous_quantity: int;
+  previous_quantity: number;
   counted_quantity: number | null;
   variance: number | null;
   notes: string | null;
@@ -24,7 +24,7 @@ type StockCountLine = {
 
 type StockCountSession = {
   stock_count_session_id: string;
-  status: str;
+  status: string;
   count_date: string;
   stock_count_lines: StockCountLine[];
 };
