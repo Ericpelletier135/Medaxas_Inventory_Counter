@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "@/lib/api";
 import Link from "next/link";
+import LoadingView from "@/components/LoadingView";
 
 type SalesOrder = {
   sales_order_id: string;
@@ -16,6 +17,11 @@ type SalesOrder = {
 export default function SalesOrdersPage() {
   const [orders, setOrders] = useState<SalesOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [transitionMsg, setTransitionMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTransitionMsg(null);
+  }, []);
 
   useEffect(() => {
     async function loadOrders() {
@@ -30,13 +36,16 @@ export default function SalesOrdersPage() {
 
   const getStatusBadgeClass = (status: string) => `badge badge-${status}`;
 
-  if (loading) return <div>Loading orders...</div>;
+  if (loading) return <LoadingView message="Loading Sales Orders..." />;
+  if (transitionMsg) return <LoadingView message={transitionMsg} />;
 
   return (
-    <div>
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ color: "var(--primary)" }}>Sales Orders</h1>
-        <p style={{ color: "var(--text-secondary)" }}>View generated purchase orders</p>
+    <div className="flex-col w-full">
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <h1>Sales Orders</h1>
+          <p>View generated purchase orders</p>
+        </div>
       </div>
 
       <div className="table-container">
@@ -53,7 +62,7 @@ export default function SalesOrdersPage() {
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center", fontStyle: "italic", color: "var(--text-secondary)" }}>
+                <td colSpan={5} className="text-center text-secondary" style={{ fontStyle: "italic" }}>
                   No sales orders generated yet.
                 </td>
               </tr>
@@ -69,8 +78,11 @@ export default function SalesOrdersPage() {
                   </td>
                   <td>{order.total_items} items</td>
                   <td>
-                    <Link href={`/dashboard/sales-orders/${order.sales_order_id}`}>
-                      <button className="btn-secondary">View Details</button>
+                    <Link
+                      href={`/dashboard/sales-orders/${order.sales_order_id}`}
+                      onClick={() => setTransitionMsg("Loading order details...")}
+                    >
+                      <button className="btn-secondary btn-sm">View Details</button>
                     </Link>
                   </td>
                 </tr>

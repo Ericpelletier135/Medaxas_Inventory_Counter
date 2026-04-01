@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { fetchWithAuth } from "@/lib/api";
+import LoadingView from "@/components/LoadingView";
 
 type VendorStatus = "active" | "inactive";
 
@@ -145,24 +146,24 @@ export default function VendorsPage() {
     }
   }
 
-  if (loading) return <div>Loading vendors...</div>;
+  if (loading) return <LoadingView message="Loading Vendors..." />;
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-        <div>
-          <h1 style={{ color: "var(--primary)" }}>Vendor Management</h1>
-          <p style={{ color: "var(--text-secondary)" }}>
-            Manage suppliers and review each vendor&apos;s items.
-          </p>
+    <div className="flex-col">
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <h1>Vendor Management</h1>
+          <p>Manage suppliers and review each vendor&apos;s items.</p>
         </div>
-        <button className="btn-primary" onClick={openCreateModal}>
-          Create Vendor
-        </button>
+        <div className="header-actions">
+          <button className="btn-primary" onClick={openCreateModal}>
+            + New Vendor
+          </button>
+        </div>
       </div>
 
-      <div className="card" style={{ marginBottom: "1rem" }}>
-        <div style={styles.filterRow}>
+      <div className="card mb-4 p-4">
+        <div className="flex-row gap-4 items-center flex-wrap">
           <input
             className="input-field"
             placeholder="Search vendor name, contact, or email..."
@@ -198,7 +199,7 @@ export default function VendorsPage() {
           <tbody>
             {filteredVendors.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: "center", color: "var(--text-secondary)" }}>
+                <td colSpan={6} className="text-center text-secondary">
                   No vendors match your filters.
                 </td>
               </tr>
@@ -206,7 +207,7 @@ export default function VendorsPage() {
               filteredVendors.map((vendor) => (
                 <tr key={vendor.vendor_id}>
                   <td>
-                    <Link href={`/dashboard/vendors/${vendor.vendor_id}`} style={styles.link}>
+                    <Link href={`/dashboard/vendors/${vendor.vendor_id}`} className="text-primary" style={{ fontWeight: 600 }}>
                       {vendor.vendor_name}
                     </Link>
                   </td>
@@ -219,8 +220,8 @@ export default function VendorsPage() {
                     </span>
                   </td>
                   <td>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button className="btn-secondary" onClick={() => startEdit(vendor)}>
+                    <div className="flex-row gap-2">
+                      <button className="btn-secondary btn-sm" onClick={() => startEdit(vendor)}>
                         Edit
                       </button>
                     </div>
@@ -233,15 +234,29 @@ export default function VendorsPage() {
       </div>
 
       {isModalOpen && (
-        <div style={styles.modalOverlay} onClick={resetForm}>
-          <div className="card" style={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: "1rem" }}>
-              {editingVendorId ? "Edit Vendor" : "Create Vendor"}
-            </h3>
+        <div
+          className="flex-col items-center justify-center p-4"
+          style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.45)", zIndex: 1000 }}
+          onClick={resetForm}
+        >
+          <div className="card w-full" style={{ maxWidth: "720px", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex-row justify-between items-center mb-4">
+              <h3 className="mb-0">
+                {editingVendorId ? "Edit Vendor" : "Create Vendor"}
+              </h3>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="text-secondary hover:text-danger"
+                style={{ background: "none", border: "none", fontSize: "1.25rem", cursor: "pointer", lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
             <form onSubmit={handleSubmit}>
-              <div style={styles.grid}>
-                <div>
-                  <label style={styles.label}>Vendor Name *</label>
+              <div className="form-grid cols-2">
+                <div className="form-group mb-0">
+                  <label className="form-label">Vendor Name *</label>
                   <input
                     className="input-field"
                     value={form.vendor_name}
@@ -249,16 +264,16 @@ export default function VendorsPage() {
                     required
                   />
                 </div>
-                <div>
-                  <label style={styles.label}>Contact Name</label>
+                <div className="form-group mb-0">
+                  <label className="form-label">Contact Name</label>
                   <input
                     className="input-field"
                     value={form.contact_name}
                     onChange={(e) => setForm((prev) => ({ ...prev, contact_name: e.target.value }))}
                   />
                 </div>
-                <div>
-                  <label style={styles.label}>Email</label>
+                <div className="form-group mb-0">
+                  <label className="form-label">Email</label>
                   <input
                     className="input-field"
                     type="email"
@@ -266,16 +281,16 @@ export default function VendorsPage() {
                     onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                   />
                 </div>
-                <div>
-                  <label style={styles.label}>Phone</label>
+                <div className="form-group mb-0">
+                  <label className="form-label">Phone</label>
                   <input
                     className="input-field"
                     value={form.phone_number}
                     onChange={(e) => setForm((prev) => ({ ...prev, phone_number: e.target.value }))}
                   />
                 </div>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={styles.label}>Address</label>
+                <div className="form-group mb-0" style={{ gridColumn: "1 / -1" }}>
+                  <label className="form-label">Address</label>
                   <input
                     className="input-field"
                     value={form.address}
@@ -283,8 +298,8 @@ export default function VendorsPage() {
                   />
                 </div>
                 {editingVendorId && (
-                  <div>
-                    <label style={styles.label}>Status</label>
+                  <div className="form-group mb-0">
+                    <label className="form-label">Status</label>
                     <select
                       className="input-field"
                       value={form.status}
@@ -302,8 +317,9 @@ export default function VendorsPage() {
                 )}
               </div>
 
-              <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
-                <button className="btn-primary" disabled={saving} type="submit">
+              <div className="flex-row gap-3 mt-4">
+                <button className="btn-primary flex-row items-center justify-center gap-2" disabled={saving} type="submit">
+                  {saving && <span className="spinner" />}
                   {saving ? "Saving..." : editingVendorId ? "Save Changes" : "Create Vendor"}
                 </button>
                 <button className="btn-secondary" type="button" onClick={resetForm}>
@@ -317,43 +333,3 @@ export default function VendorsPage() {
     </div>
   );
 }
-
-const styles = {
-  label: {
-    display: "block",
-    fontSize: "0.85rem",
-    color: "var(--text-secondary)",
-    marginBottom: "0.35rem",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "0.9rem",
-  },
-  filterRow: {
-    display: "flex",
-    gap: "0.75rem",
-    alignItems: "center",
-    flexWrap: "wrap" as const,
-  },
-  link: {
-    color: "var(--primary)",
-    fontWeight: 600,
-  },
-  modalOverlay: {
-    position: "fixed" as const,
-    inset: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.45)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-    padding: "1rem",
-  },
-  modalCard: {
-    width: "100%",
-    maxWidth: "720px",
-    maxHeight: "90vh",
-    overflowY: "auto" as const,
-  },
-};

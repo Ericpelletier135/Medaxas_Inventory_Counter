@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { fetchWithAuth } from "@/lib/api";
+import LoadingView from "@/components/LoadingView";
 
 interface Item {
   id: string;
@@ -18,10 +18,14 @@ interface Item {
 }
 
 export default function ItemsPage() {
-  const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [transitionMsg, setTransitionMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTransitionMsg(null);
+  }, []);
 
   async function loadItems() {
     const res = await fetchWithAuth("/api/items");
@@ -52,30 +56,32 @@ export default function ItemsPage() {
   }
 
   if (loading) {
-    return <div style={{ color: "var(--text-secondary)" }}>Loading items…</div>;
+    return <LoadingView message="Loading items…" />;
+  }
+  if (transitionMsg) {
+    return <LoadingView message={transitionMsg} />;
   }
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "2rem",
-        }}
-      >
-        <div>
-          <h1 style={{ color: "var(--primary)" }}>Items</h1>
-          <p style={{ color: "var(--text-secondary)" }}>
-            Manage your inventory catalogue
-          </p>
+    <div className="flex-col w-full">
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <h1>Items</h1>
+          <p>Manage your inventory catalogue</p>
         </div>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <Link href="/dashboard/items/import" className="btn-secondary">
+        <div className="header-actions">
+          <Link 
+            href="/dashboard/items/import" 
+            className="btn-secondary"
+            onClick={() => setTransitionMsg("Loading import utility...")}
+          >
             Import CSV
           </Link>
-          <Link href="/dashboard/items/new" className="btn-primary">
+          <Link 
+            href="/dashboard/items/new" 
+            className="btn-primary"
+            onClick={() => setTransitionMsg("Preparing item creation form...")}
+          >
             + New Item
           </Link>
         </div>
@@ -98,14 +104,7 @@ export default function ItemsPage() {
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td
-                  colSpan={8}
-                  style={{
-                    textAlign: "center",
-                    fontStyle: "italic",
-                    color: "var(--text-secondary)",
-                  }}
-                >
+                <td colSpan={8} className="text-center text-secondary" style={{ fontStyle: "italic" }}>
                   No items found. Create your first item to get started.
                 </td>
               </tr>
@@ -113,29 +112,26 @@ export default function ItemsPage() {
               items.map((item) => (
                 <tr key={item.id}>
                   <td style={{ fontWeight: 500 }}>{item.name}</td>
-                  <td style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
+                  <td className="text-secondary" style={{ fontSize: "0.875rem" }}>
                     {item.sku ?? "—"}
                   </td>
-                  <td style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
+                  <td className="text-secondary" style={{ fontSize: "0.875rem" }}>
                     {item.unit_of_measure ?? "—"}
                   </td>
                   <td>
                     <span
                       style={{
                         fontWeight: 600,
-                        color:
-                          item.current_quantity <= item.minimum_quantity
-                            ? "var(--danger)"
-                            : "var(--text-primary)",
+                        color: item.current_quantity <= item.minimum_quantity ? "var(--danger)" : "var(--text-primary)",
                       }}
                     >
                       {item.current_quantity}
                     </span>
                   </td>
-                  <td style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
+                  <td className="text-secondary" style={{ fontSize: "0.875rem" }}>
                     {item.minimum_quantity}
                   </td>
-                  <td style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
+                  <td className="text-secondary" style={{ fontSize: "0.875rem" }}>
                     {item.barcode || "—"}
                   </td>
                   <td>
@@ -144,22 +140,17 @@ export default function ItemsPage() {
                     </span>
                   </td>
                   <td>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <div className="flex-row gap-2">
                       <Link
                         href={`/dashboard/items/${item.id}/edit`}
-                        className="btn-secondary"
-                        style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
+                        className="btn-secondary btn-sm"
+                        onClick={() => setTransitionMsg("Loading item details for editing...")}
                       >
                         Edit
                       </Link>
                       <button
-                        className="btn-secondary"
-                        style={{
-                          fontSize: "0.8rem",
-                          padding: "0.35rem 0.75rem",
-                          color: "var(--danger)",
-                          borderColor: "var(--danger)",
-                        }}
+                        className="btn-secondary btn-sm text-danger"
+                        style={{ borderColor: "var(--danger)" }}
                         disabled={deletingId === item.id}
                         onClick={() => handleDelete(item.id, item.name)}
                       >
