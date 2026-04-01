@@ -45,8 +45,7 @@ export default function Sidebar({
 
   return (
     <aside 
-      className={`sidebar ${isOpen ? "mobile-open" : ""}`}
-      style={{ width: collapsed ? "72px" : "250px" }}
+      className={`sidebar ${isOpen ? "mobile-open" : ""} ${collapsed ? "collapsed" : ""}`}
     >
       <div className="sidebar-logo-container" style={{ padding: collapsed ? "1.5rem 0.75rem" : "1.5rem" }}>
         {!collapsed && (
@@ -128,31 +127,14 @@ export default function Sidebar({
           {collapsed ? "↩" : "Log out"}
         </button>
       </div>
-      {canToggle && (
-        <button
-          type="button"
-          onClick={onToggle}
-          title={collapsed ? "Expand menu" : "Collapse menu"}
-          style={{
-            position: "absolute",
-            top: "0.75rem",
-            right: "-14px",
-            width: "28px",
-            height: "28px",
-            borderRadius: "999px",
-            border: "1px solid var(--border)",
-            background: "var(--surface)",
-            color: "var(--text-secondary)",
-            cursor: "pointer",
-            fontSize: "0.9rem",
-            lineHeight: 1,
-            display: (typeof window !== 'undefined' && window.innerWidth < 768) ? "none" : "grid",
-            placeItems: "center",
-          }}
-        >
-          {collapsed ? "»" : "«"}
-        </button>
-      )}
+      <button
+        type="button"
+        className="sidebar-collapse-btn"
+        onClick={onToggle}
+        title={collapsed ? "Expand menu" : "Collapse menu"}
+      >
+        {collapsed ? "»" : "«"}
+      </button>
     </aside>
   );
 }

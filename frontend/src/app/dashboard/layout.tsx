@@ -15,16 +15,12 @@ export default function DashboardLayout({
   const pathname = usePathname();
   
   // States from 'main' (Collapsing / Admin Check)
-  const isImportRoute = pathname.startsWith("/dashboard/items/import");
-  const [collapsed, setCollapsed] = useState(isImportRoute);
+  const [collapsed, setCollapsed] = useState(false);
   
   // States from 'mobile-responsiveness' (Mobile Toggle / Loading Curtain)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [transitionMsg, setTransitionMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    setCollapsed(isImportRoute);
-  }, [isImportRoute, pathname]);
 
   // Handle route changes
   useEffect(() => {
@@ -68,7 +64,7 @@ export default function DashboardLayout({
         onNavigate={(msg) => setTransitionMsg(msg)}
         collapsed={collapsed}
         onToggle={handleToggleSidebar}
-        canToggle={isImportRoute}
+        canToggle={true}
       />
       
       <main className="dashboard-main">

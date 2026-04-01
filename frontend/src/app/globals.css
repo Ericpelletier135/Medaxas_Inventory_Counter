@@ -364,7 +364,11 @@ tr:hover {
   top: 0;
   left: 0;
   z-index: 40;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.sidebar.collapsed {
+  width: 72px;
 }
 
 .sidebar-logo-container {
@@ -433,10 +437,43 @@ tr:hover {
   margin-left: 72px;
 }
 
+/* Sidebar toggle button (desktop) */
+.sidebar-collapse-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  transition: background-color 0.2s;
+}
+
+.sidebar-collapse-btn:hover {
+  background-color: #f3f4f6;
+  color: var(--primary);
+}
+
 @media (max-width: 768px) {
   .dashboard-main {
-    margin-left: 0;
+    margin-left: 0 !important;
     padding: 1rem;
+  }
+  
+  .sidebar.collapsed {
+    width: var(--sidebar-width); /* Force full width on mobile even if collapsed state is true */
+  }
+
+  .sidebar-collapse-btn {
+    display: none;
   }
 }
 
