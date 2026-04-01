@@ -1,19 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clearAuthTokens } from "@/lib/api";
 
-export default function Sidebar({
-  collapsed = false,
-  onToggle,
-  canToggle = false,
-}: {
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  onNavigate?: (message: string) => void;
   collapsed?: boolean;
   onToggle?: () => void;
   canToggle?: boolean;
-}) {
+}
+
+export default function Sidebar({
+  isOpen,
+  setIsOpen,
+  onNavigate,
+  collapsed = false,
+  onToggle,
+  canToggle = false,
+}: SidebarProps) {
   const pathname = usePathname();
+  const [clickedHref, setClickedHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Reset visual loading state once Next.js router transitions catch up
+    setClickedHref(null);
+  }, [pathname]);
 
   const links = [
     { name: "Overview", href: "/dashboard", icon: "📊" },
@@ -29,68 +44,84 @@ export default function Sidebar({
   }
 
   return (
-    <aside
-      style={{
-        ...styles.sidebar,
-        width: collapsed ? "72px" : "250px",
-      }}
+    <aside 
+      className={`sidebar ${isOpen ? "mobile-open" : ""}`}
+      style={{ width: collapsed ? "72px" : "250px" }}
     >
-      <div style={{ ...styles.logo, padding: collapsed ? "1.5rem 0.75rem" : "2rem 1.5rem" }}>
+      <div className="sidebar-logo-container" style={{ padding: collapsed ? "1.5rem 0.75rem" : "1.5rem" }}>
         {!collapsed && (
-          <>
+          <div>
             <h2 style={{ margin: 0, color: "var(--primary)" }}>Medaxas</h2>
             <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>by Divocco</span>
-          </>
+          </div>
         )}
+        {/* Close Button on Mobile */}
+        <button 
+          className="menu-toggle-btn" 
+          onClick={() => setIsOpen(false)} 
+          style={{ display: isOpen ? "block" : "none" }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
 
-      <nav
-        style={{
-          ...styles.nav,
-          padding: collapsed ? "1.5rem 0.5rem" : "1.5rem 1rem",
-        }}
-      >
+      <nav className="sidebar-nav" style={{ padding: collapsed ? "1.5rem 0.5rem" : "1.5rem 1rem" }}>
         {links.map((link) => {
-          const isActive = 
+          const isTrueActive = 
             link.href === "/dashboard" 
               ? pathname === "/dashboard" 
               : pathname === link.href || pathname.startsWith(link.href + "/");
               
+          const isPendingActive = clickedHref === link.href && !isTrueActive;
+          const isActive = isTrueActive || (clickedHref === link.href);
+
           return (
             <Link
               key={link.name}
               href={link.href}
+              className={`sidebar-link ${isActive ? "active" : ""}`}
               style={{
-                ...styles.link,
-                ...(isActive ? styles.linkActive : {}),
-                display: "flex",
-                alignItems: "center",
-                gap: collapsed ? "0" : "0.75rem",
                 justifyContent: collapsed ? "center" : "flex-start",
                 padding: collapsed ? "0.75rem 0.5rem" : "0.75rem 1rem",
+                gap: collapsed ? "0" : "0.75rem",
+              }}
+              onClick={(e) => {
+                if (pathname === link.href) {
+                  setIsOpen(false);
+                  return;
+                }
+                setClickedHref(link.href);
+                setIsOpen(false); 
+                if (onNavigate) onNavigate(`Loading ${link.name}...`);
               }}
               title={collapsed ? link.name : undefined}
             >
               <span style={{ fontSize: "1.1rem" }}>{link.icon}</span>
-              {!collapsed && link.name}
+              {!collapsed && <span style={{ flexGrow: 1 }}>{link.name}</span>}
+              {isPendingActive && !collapsed && (
+                <span className="spinner" style={{ width: "1rem", height: "1rem", borderWidth: "2px" }} />
+              )}
             </Link>
           );
         })}
       </nav>
       
-      <div style={styles.footer}>
-        <button
+      <div className="sidebar-footer">
+        <button 
           type="button"
           onClick={handleLogout}
-          style={{
-            ...styles.link,
-            color: "var(--danger)",
-            textAlign: collapsed ? "center" : "left",
-            padding: collapsed ? "0.75rem 0.5rem" : "0.75rem 1rem",
-            width: "100%",
-            border: "none",
-            background: "transparent",
+          className="sidebar-link text-danger"
+          style={{ 
+            width: "100%", 
+            border: "none", 
+            background: "transparent", 
             cursor: "pointer",
+            textAlign: collapsed ? "center" : "left",
+            justifyContent: collapsed ? "center" : "flex-start",
+            padding: collapsed ? "0.75rem 0.5rem" : "0.75rem 1rem",
           }}
           title={collapsed ? "Log out" : undefined}
         >
@@ -115,7 +146,7 @@ export default function Sidebar({
             cursor: "pointer",
             fontSize: "0.9rem",
             lineHeight: 1,
-            display: "grid",
+            display: (typeof window !== 'undefined' && window.innerWidth < 768) ? "none" : "grid",
             placeItems: "center",
           }}
         >
@@ -125,44 +156,3 @@ export default function Sidebar({
     </aside>
   );
 }
-
-const styles = {
-  sidebar: {
-    width: "250px",
-    height: "100vh",
-    backgroundColor: "var(--surface)",
-    borderRight: "1px solid var(--border)",
-    display: "flex",
-    flexDirection: "column" as const,
-    position: "fixed" as const,
-    top: 0,
-    left: 0,
-  },
-  logo: {
-    padding: "2rem 1.5rem",
-    borderBottom: "1px solid var(--border)",
-  },
-  nav: {
-    padding: "1.5rem 1rem",
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "0.5rem",
-    flex: 1,
-  },
-  link: {
-    display: "block",
-    padding: "0.75rem 1rem",
-    borderRadius: "var(--radius-md)",
-    color: "var(--text-primary)",
-    fontWeight: 500,
-    transition: "background-color 0.2s, color 0.2s",
-  },
-  linkActive: {
-    backgroundColor: "var(--primary)",
-    color: "white",
-  },
-  footer: {
-    padding: "1rem",
-    borderTop: "1px solid var(--border)",
-  }
-};
