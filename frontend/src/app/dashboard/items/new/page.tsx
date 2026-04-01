@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ItemForm, { type ItemFormValues } from "@/components/ItemForm";
+import Link from "next/link";
+import type { ItemFormValues } from "@/components/ItemForm";
+import dynamic from "next/dynamic";
 import { fetchWithAuth } from "@/lib/api";
+import LoadingView from "@/components/LoadingView";
+
+const ItemForm = dynamic(() => import("@/components/ItemForm"), {
+  loading: () => <LoadingView message="Initializing form utilities..." />
+});
 
 export default function CreateItemPage() {
   const router = useRouter();
@@ -44,27 +51,20 @@ export default function CreateItemPage() {
   }
 
   return (
-    <div>
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ color: "var(--primary)" }}>Create New Item</h1>
-        <p style={{ color: "var(--text-secondary)" }}>
-          Fill in the details manually, or upload a product photo to auto-fill.
-        </p>
+    <div className="flex-col w-full">
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <Link href="/dashboard/items" className="text-secondary mb-2 inline-block hover:text-primary" style={{ fontSize: "0.9rem", fontWeight: 500, textDecoration: "none" }}>
+            ← Back to Items
+          </Link>
+          <h1>Create New Item</h1>
+          <p>Fill in the details manually, or upload a product photo to auto-fill.</p>
+        </div>
       </div>
 
-      <div className="card">
+      <div className="card w-full">
         {apiError && (
-          <div
-            style={{
-              backgroundColor: "#fee2e2",
-              border: "1px solid #fca5a5",
-              borderRadius: "var(--radius-md)",
-              padding: "0.75rem 1rem",
-              color: "var(--danger)",
-              fontSize: "0.875rem",
-              marginBottom: "1.5rem",
-            }}
-          >
+          <div className="form-error mb-6 p-3" style={{ backgroundColor: "#fee2e2", border: "1px solid #fca5a5", borderRadius: "var(--radius-md)" }}>
             {apiError}
           </div>
         )}

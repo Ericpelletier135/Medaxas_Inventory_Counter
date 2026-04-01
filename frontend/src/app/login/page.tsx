@@ -11,10 +11,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/api/auth/login/refresh`, {
@@ -36,35 +38,26 @@ export default function LoginPage() {
       router.push(user?.is_admin ? "/admin/users" : "/dashboard");
     } catch {
       setError("Network error");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        backgroundColor: "var(--background)",
-      }}
-    >
-      <div className="card" style={{ width: "100%", maxWidth: "400px" }}>
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h1 style={{ color: "var(--primary)", fontSize: "1.75rem", fontWeight: 700 }}>
+    <main className="auth-page">
+      <div className="auth-card">
+        <div className="text-center mb-8">
+          <h1 className="text-primary mb-2" style={{ fontSize: "1.75rem", fontWeight: 700 }}>
             Medaxas
           </h1>
-          <p style={{ color: "var(--text-secondary)", marginTop: "0.25rem", fontSize: "0.95rem" }}>
+          <p className="text-secondary" style={{ fontSize: "0.95rem" }}>
             Sign in to your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-            <label style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-primary)" }}>
-              Email
-            </label>
+        <form onSubmit={handleSubmit} className="flex-col gap-4">
+          <div className="form-group">
+            <label className="form-label">Email</label>
             <input
               type="email"
               placeholder="you@example.com"
@@ -75,10 +68,8 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-            <label style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-primary)" }}>
-              Password
-            </label>
+          <div className="form-group">
+            <label className="form-label">Password</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -90,17 +81,19 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p style={{ color: "var(--danger)", fontSize: "0.875rem", textAlign: "center" }}>
+            <p className="form-error text-center mb-2">
               {error}
             </p>
           )}
 
           <button
             type="submit"
-            className="btn-primary"
-            style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem" }}
+            className="btn-primary mt-2 flex-row items-center justify-center gap-2"
+            disabled={loading}
+            style={{ width: "100%", padding: "0.75rem" }}
           >
-            Sign In
+            {loading && <span className="spinner" />}
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
       </div>
