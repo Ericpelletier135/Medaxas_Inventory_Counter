@@ -54,7 +54,7 @@ class StockCountSessionCreate(StockCountSessionBase):
 class StockCountSessionRead(StockCountSessionBase):
     stock_count_session_id: uuid.UUID
     status: str
-    created_by_user_id: uuid.UUID
+    created_by_user_id: Optional[uuid.UUID]
     completed_by_user_id: Optional[uuid.UUID]
     created_at: datetime
     completed_at: Optional[datetime]

@@ -71,9 +71,14 @@ export default function ItemsPage() {
             Manage your inventory catalogue
           </p>
         </div>
-        <Link href="/dashboard/items/new" className="btn-primary">
-          + New Item
-        </Link>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Link href="/dashboard/items/import" className="btn-secondary">
+            Import CSV
+          </Link>
+          <Link href="/dashboard/items/new" className="btn-primary">
+            + New Item
+          </Link>
+        </div>
       </div>
 
       <div className="table-container">

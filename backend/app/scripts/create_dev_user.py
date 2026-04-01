@@ -34,6 +34,7 @@ async def _create_dev_user() -> None:
             is_verified=True,
             first_name="Dev",
             last_name="User",
+            is_admin=True,
             role="admin",
             status="active",
         )

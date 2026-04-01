@@ -32,7 +32,7 @@ class SalesOrderRead(SalesOrderBase):
     sales_order_id: uuid.UUID
     vendor_id: Optional[uuid.UUID]
     stock_count_session_id: Optional[uuid.UUID]
-    created_by_user_id: uuid.UUID
+    created_by_user_id: Optional[uuid.UUID]
     status: str
     order_number: str
     order_date: date

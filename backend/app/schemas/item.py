@@ -41,3 +41,14 @@ class ItemUpdate(BaseModel):
     vendor_id: Optional[uuid.UUID] = None
     barcode: Optional[str] = Field(default=None, max_length=255)
 
+
+class ItemBulkImportRequest(BaseModel):
+    rows: list[dict[str, str]]
+    mapping: dict[str, str]
+
+
+class ItemBulkImportResponse(BaseModel):
+    created_count: int
+    skipped_count: int
+    errors: list[str]
+

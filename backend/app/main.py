@@ -10,6 +10,7 @@ from app.api.auth import router as auth_router
 from app.api.vendors import router as vendors_router
 from app.api.items import router as items_router
 from app.api.gemini import router as gemini_router
+from app.api.admin import router as admin_router
 
 # Import all models so they are registered on Base.metadata
 import app.models  # noqa: F401
@@ -57,6 +58,7 @@ app.include_router(auth_router)
 app.include_router(vendors_router)
 app.include_router(items_router)
 app.include_router(gemini_router)
+app.include_router(admin_router)
 
 from app.api.stock_counts import router as stock_counts_router
 from app.api.sales_orders import router as sales_orders_router

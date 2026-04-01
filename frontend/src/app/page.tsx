@@ -3,14 +3,19 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { fetchCurrentUser } from "@/lib/api";
 
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (localStorage.getItem("access_token")) {
-      router.push("/dashboard");
+    async function routeAuthenticatedUser() {
+      if (!localStorage.getItem("access_token")) return;
+      const user = await fetchCurrentUser();
+      router.push(user?.is_admin ? "/admin/users" : "/dashboard");
     }
+
+    routeAuthenticatedUser();
   }, [router]);
 
   return (
