@@ -422,10 +422,22 @@ tr:hover {
 /* Main Content Area */
 .dashboard-main {
   flex: 1;
-  min-width: 0; /* Prevents flexbox escaping its container */
+  min-width: 0;
   padding: 2rem;
   margin-left: var(--sidebar-width);
   transition: margin-left 0.3s ease-in-out;
+}
+
+/* Dynamic margins based on sidebar state */
+.dashboard-layout.is-collapsed .dashboard-main {
+  margin-left: 72px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: 0;
+    padding: 1rem;
+  }
 }
 
 .dashboard-header {

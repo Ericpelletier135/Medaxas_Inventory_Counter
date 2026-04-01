@@ -36,7 +36,7 @@ export default function DashboardLayout({
   useEffect(() => {
     async function checkAdmin() {
       try {
-        const res = await fetchWithAuth("/api/users/me");
+        const res = await fetchWithAuth("/api/auth/me");
         if (res.ok) {
           const user = await res.json();
           if (user?.is_admin) {
@@ -55,7 +55,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="dashboard-layout">
+    <div className={`dashboard-layout ${collapsed ? "is-collapsed" : ""}`}>
       {/* Overlay for mobile sidebar */}
       <div 
         className={`sidebar-overlay ${isSidebarOpen ? "mobile-open" : ""}`} 
@@ -71,14 +71,7 @@ export default function DashboardLayout({
         canToggle={isImportRoute}
       />
       
-      <main 
-        className="dashboard-main"
-        style={{ 
-          marginLeft: (typeof window !== 'undefined' && window.innerWidth > 768) 
-            ? (collapsed ? "72px" : "250px") 
-            : "0" 
-        }}
-      >
+      <main className="dashboard-main">
         {/* Mobile Header with Hamburger Menu */}
         <div className="mobile-header">
           <h2 style={{ margin: 0, color: "var(--primary)" }}>Medaxas</h2>
