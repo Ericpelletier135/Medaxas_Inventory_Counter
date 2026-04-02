@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { fetchWithAuth } from "@/lib/api";
+import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -61,8 +62,6 @@ const UNIT_OPTIONS = [
   { value: "other", label: "Other" },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function ItemForm({
   initialValues,
   onSubmit,
@@ -97,16 +96,12 @@ export default function ItemForm({
       .catch(() => {/* non-fatal */});
   }, []);
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
   function set<K extends keyof ItemFormValues>(
     key: K,
     value: ItemFormValues[K]
   ) {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
-
-  // ── AI image processing (shared) ───────────────────────────────────────────
 
   async function processBase64Image(base64: string, mimeType: string) {
     setAiLoading(true);
@@ -153,7 +148,6 @@ export default function ItemForm({
     const objectUrl = URL.createObjectURL(file);
     setAiPreview(objectUrl);
 
-    // Convert to base64
     const base64 = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
@@ -164,8 +158,6 @@ export default function ItemForm({
     await processBase64Image(base64, file.type);
   }
 
-  // ── Camera capture ─────────────────────────────────────────────────────────
-
   async function startCamera() {
     try {
       setAiError(null);
@@ -175,7 +167,6 @@ export default function ItemForm({
       setCameraStream(stream);
       setShowCamera(true);
       
-      // Wait for React to render the <video> element before attaching the stream
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -203,30 +194,23 @@ export default function ItemForm({
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     
-    // Draw current video frame to canvas
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convert to base64 JPEG
     const base64 = canvas.toDataURL("image/jpeg", 0.9);
     
-    // Cleanup camera
     stopCamera();
     
-    // Feed to existing flow
     setAiPreview(base64);
     await processBase64Image(base64, "image/jpeg");
   }
 
-  // Cleanup camera on unmount
   useEffect(() => {
     return () => {
       if (cameraStream) stopCamera();
     };
   }, [cameraStream]);
-
-  // ── Form submit ────────────────────────────────────────────────────────────
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -249,36 +233,20 @@ export default function ItemForm({
     });
   }
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
-
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <form onSubmit={handleSubmit} className="flex-col gap-6">
 
-      {/* ── AI Image Upload ──────────────────────────────────────────── */}
-      <div className="card" style={{ padding: "1.25rem" }}>
-        <h3 style={{ marginBottom: "0.75rem", fontSize: "0.95rem", color: "var(--primary)" }}>
-          ✨ AI Auto-fill from Photo
-        </h3>
-        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.75rem" }}>
+      {/* AI Image Upload */}
+      <div className="card">
+        <h3 className="text-primary mb-2">✨ AI Auto-fill from Photo</h3>
+        <p className="text-secondary mb-4" style={{ fontSize: "0.85rem" }}>
           Upload a product photo and we'll pre-fill the form for you.
         </p>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+        <div className="flex-row items-center gap-4 flex-wrap">
           <label
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.5rem 1rem",
-              borderRadius: "var(--radius-md)",
-              border: "1px dashed var(--primary)",
-              color: "var(--primary)",
-              fontWeight: 500,
-              fontSize: "0.875rem",
-              cursor: aiLoading || showCamera ? "not-allowed" : "pointer",
-              opacity: aiLoading || showCamera ? 0.7 : 1,
-              transition: "background 0.2s",
-            }}
+            className={`btn-secondary ${aiLoading || showCamera ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+            style={{ borderStyle: "dashed", borderColor: "var(--primary)", color: "var(--primary)" }}
           >
             {aiLoading ? "Scanning…" : "📷 Upload Photo"}
             <input
@@ -295,21 +263,8 @@ export default function ItemForm({
             type="button"
             onClick={startCamera}
             disabled={aiLoading || showCamera}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.5rem 1rem",
-              borderRadius: "var(--radius-md)",
-              background: "transparent",
-              border: "1px dashed var(--primary)",
-              color: "var(--primary)",
-              fontSize: "0.875rem",
-              fontWeight: 500,
-              cursor: aiLoading || showCamera ? "not-allowed" : "pointer",
-              opacity: aiLoading || showCamera ? 0.7 : 1,
-              transition: "background 0.2s",
-            }}
+            className={`btn-secondary ${aiLoading || showCamera ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+            style={{ borderStyle: "dashed", borderColor: "var(--primary)", color: "var(--primary)" }}
           >
             🎥 Take Photo
           </button>
@@ -331,16 +286,7 @@ export default function ItemForm({
 
         {/* Camera UI overlay */}
         {showCamera && (
-          <div style={{ 
-            marginTop: "1rem", 
-            padding: "1rem", 
-            background: "#000", 
-            borderRadius: "var(--radius-lg)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "1rem"
-          }}>
+          <div className="flex-col items-center gap-4 mt-4 p-4" style={{ background: "#000", borderRadius: "var(--radius-lg)" }}>
             <video
               ref={videoRef}
               style={{ width: "100%", maxWidth: 400, borderRadius: "var(--radius-md)" }}
@@ -350,35 +296,11 @@ export default function ItemForm({
             />
             <canvas ref={canvasRef} style={{ display: "none" }} />
             
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <button
-                type="button"
-                onClick={stopCamera}
-                style={{
-                  padding: "0.5rem 1rem",
-                  borderRadius: "2rem",
-                  background: "#333",
-                  color: "#fff",
-                  border: "none",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
+            <div className="flex-row gap-4">
+              <button type="button" onClick={stopCamera} className="btn-secondary" style={{ background: "#333", color: "#fff", border: "none", borderRadius: "2rem", padding: "0.5rem 1.5rem" }}>
                 Cancel
               </button>
-              <button
-                type="button"
-                onClick={capturePhoto}
-                style={{
-                  padding: "0.5rem 1.5rem",
-                  borderRadius: "2rem",
-                  background: "var(--primary)",
-                  color: "#fff",
-                  border: "none",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
+              <button type="button" onClick={capturePhoto} className="btn-primary" style={{ borderRadius: "2rem", padding: "0.5rem 1.5rem" }}>
                 📸 Capture
               </button>
             </div>
@@ -386,15 +308,11 @@ export default function ItemForm({
         )}
 
         {aiError && (
-          <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginTop: "0.5rem" }}>
-            {aiError}
-          </p>
+          <p className="form-error mt-2">{aiError}</p>
         )}
       </div>
 
-      {/* ── Core Fields ──────────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-
+      <div className="form-grid cols-2">
         <FormField label="Item Name *">
           <input
             className="input-field"
@@ -446,8 +364,7 @@ export default function ItemForm({
         </FormField>
       </div>
 
-      {/* ── Quantities ───────────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+      <div className="form-grid cols-2">
         <FormField label="Current Qty">
           <input
             className="input-field"
@@ -477,8 +394,7 @@ export default function ItemForm({
         </FormField>
       </div>
 
-      {/* ── Vendor & Barcode ─────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div className="form-grid cols-2">
         <FormField label="Vendor">
           <select
             className="input-field"
@@ -504,18 +420,7 @@ export default function ItemForm({
             placeholder="Scan or type barcode"
             style={{ opacity: values.no_barcode ? 0.5 : 1 }}
           />
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              marginTop: "0.4rem",
-              fontSize: "0.8rem",
-              color: "var(--text-secondary)",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
-          >
+          <label className="flex-row items-center gap-2 mt-2 text-secondary cursor-pointer" style={{ fontSize: "0.85rem", userSelect: "none" }}>
             <input
               type="checkbox"
               checked={values.no_barcode}
@@ -529,29 +434,27 @@ export default function ItemForm({
         </FormField>
       </div>
 
-      {/* ── Error & Submit ───────────────────────────────────────────── */}
       {error && (
-        <p style={{ color: "var(--danger)", fontSize: "0.875rem" }}>{error}</p>
+        <p className="form-error">{error}</p>
       )}
 
-      <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
-        <a href="/dashboard/items" className="btn-secondary">
+      <div className="flex-row gap-3 justify-end mt-4">
+        <Link href="/dashboard/items" className="btn-secondary">
           Cancel
-        </a>
+        </Link>
         <button
           type="submit"
-          className="btn-primary"
+          className="btn-primary flex-row items-center justify-center gap-2"
           disabled={isSubmitting || aiLoading}
           style={{ minWidth: 120 }}
         >
+          {isSubmitting && <span className="spinner" />}
           {isSubmitting ? "Saving…" : submitLabel}
         </button>
       </div>
     </form>
   );
 }
-
-// ─── Small helper for consistent label + input layout ──────────────────────
 
 function FormField({
   label,
@@ -561,10 +464,8 @@ function FormField({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-      <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--text-secondary)" }}>
-        {label}
-      </label>
+    <div className="form-group mb-0">
+      <label className="form-label">{label}</label>
       {children}
     </div>
   );

@@ -151,34 +151,36 @@ export default function StockCountDetailPage() {
   const canComplete = completedLines === totalLines && !isCompleted && totalLines > 0;
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
-        <div>
-          <h1 style={{ color: "var(--primary)", marginBottom: "0.5rem" }}>
-            Count Session <span className={`badge badge-${session.status}`} style={{ marginLeft: "1rem" }}>{session.status.replace("_", " ")}</span>
+    <div className="flex-col w-full">
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <h1 className="flex-row items-center gap-4">
+            Count Session <span className={`badge badge-${session.status}`}>{session.status.replace("_", " ")}</span>
           </h1>
-          <p style={{ color: "var(--text-secondary)" }}>
+          <p>
             Date: {session.count_date} | Items: {totalLines}
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <div className="header-actions">
           {!isCompleted ? (
             <button
-              className="btn-primary"
+              className="btn-primary flex-row items-center justify-center gap-2"
               onClick={handleComplete}
               disabled={!canComplete || completing}
               title={!canComplete ? "You must count all items before completing." : ""}
               style={{ backgroundColor: canComplete ? "var(--success)" : "var(--border)", color: canComplete ? "white" : "var(--text-secondary)" }}
             >
+              {completing && <span className="spinner" />}
               {completing ? "Completing..." : "Complete Session"}
             </button>
           ) : (
             <button
-              className="btn-primary"
+              className="btn-primary flex-row items-center justify-center gap-2"
               onClick={handleGenerateOrders}
               disabled={generating}
             >
+              {generating && <span className="spinner" />}
               {generating ? "Generating..." : "Generate Sales Orders"}
             </button>
           )}
@@ -186,10 +188,10 @@ export default function StockCountDetailPage() {
       </div>
 
       {!isCompleted && (
-        <div className="card" style={{ marginBottom: "2rem", padding: "1.5rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+        <div className="card mb-8">
+          <div className="flex-row justify-between mb-2">
             <span style={{ fontWeight: 500 }}>Counting Progress</span>
-            <span style={{ color: "var(--text-secondary)" }}>{completedLines} / {totalLines} items</span>
+            <span className="text-secondary">{completedLines} / {totalLines} items</span>
           </div>
           <div style={{ width: "100%", height: "12px", backgroundColor: "var(--border)", borderRadius: "9999px", overflow: "hidden" }}>
             <div
@@ -227,14 +229,14 @@ export default function StockCountDetailPage() {
                 <tr key={line.stock_count_line_id}>
                   <td>
                     <div style={{ fontWeight: 500 }}>{line.item.name}</div>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{line.item.sku || line.item.barcode || "N/A"}</div>
+                    <div className="text-secondary" style={{ fontSize: "0.85rem" }}>{line.item.sku || line.item.barcode || "N/A"}</div>
                   </td>
                   <td>{line.previous_quantity}</td>
                   <td>
                     <input
                       type="text"
                       className="input-field"
-                      style={{ width: "100px", textAlign: "right", backgroundColor: isCompleted ? "#f9fafb" : "white" }}
+                      style={{ width: "100%", maxWidth: "100px", textAlign: "right", backgroundColor: isCompleted ? "#f9fafb" : "white" }}
                       value={localCounts[line.stock_count_line_id] ?? ""}
                       onChange={(e) => handleCountChange(line.stock_count_line_id, e.target.value)}
                       onBlur={() => handleBlurSave(line.stock_count_line_id)}

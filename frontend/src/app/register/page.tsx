@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -13,10 +14,12 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/api/auth/register`, {
@@ -40,73 +43,80 @@ export default function RegisterPage() {
       setTimeout(() => router.push("/login"), 1500);
     } catch {
       setError("Network error");
+      setLoading(false);
     }
   }
 
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-      }}
-    >
-      <h1>Register</h1>
-      {success ? (
-        <p style={{ color: "green" }}>Account created! Redirecting to login...</p>
-      ) : (
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "0.75rem", width: "320px" }}
-        >
-          <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "0.75rem",
-              background: "#0070f3",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            Create Account
-          </button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </form>
-      )}
+    <main className="auth-page">
+      <div className="auth-card">
+        <div className="text-center mb-8">
+          <h1 className="text-primary mb-2" style={{ fontSize: "1.75rem", fontWeight: 700 }}>
+            Medaxas
+          </h1>
+          <p className="text-secondary" style={{ fontSize: "0.95rem" }}>
+            Create your account
+          </p>
+        </div>
+        {success ? (
+          <p className="text-center" style={{ color: "var(--success)" }}>Account created! Redirecting to login...</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex-col gap-4">
+            <div className="form-grid cols-2">
+              <div className="form-group mb-0">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+              <div className="form-group mb-0">
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+            </div>
+            <div className="form-group mb-0">
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="input-field"
+              />
+            </div>
+            <div className="form-group mb-0">
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="input-field"
+              />
+            </div>
+            <button type="submit" className="btn-primary mt-2 flex-row items-center justify-center gap-2" disabled={loading}>
+              {loading && <span className="spinner" />}
+              {loading ? "Creating..." : "Create Account"}
+            </button>
+            {error && <p className="form-error text-center">{error}</p>}
+            
+            <p className="text-center text-secondary mt-4" style={{ fontSize: "0.875rem" }}>
+              Already have an account?{" "}
+              <Link href="/login" className="text-primary" style={{ fontWeight: 500 }}>
+                Sign in
+              </Link>
+            </p>
+          </form>
+        )}
+      </div>
     </main>
   );
 }

@@ -19,28 +19,17 @@ export default function Home() {
   }, [router]);
 
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        gap: "1.5rem",
-        backgroundColor: "var(--background)",
-        color: "var(--text-primary)"
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <h1 style={{ color: "var(--primary)", fontSize: "2.5rem", marginBottom: "0.5rem" }}>Medaxas</h1>
-        <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem" }}>by Divocco</p>
+    <main className="hero-section">
+      <div className="text-center mb-8">
+        <h1 className="text-primary" style={{ fontSize: "2.5rem", fontWeight: "bold", marginBottom: "0.5rem" }}>Medaxas</h1>
+        <p className="text-secondary" style={{ fontSize: "1.1rem" }}>by Divocco</p>
       </div>
 
-      <p style={{ maxWidth: "500px", textAlign: "center", marginBottom: "1rem" }}>
+      <p className="text-center mb-4 max-w-md">
         Secure inventory counting and sales order automation.
       </p>
 
-      <nav style={{ display: "flex", gap: "1rem" }}>
+      <nav className="flex-row gap-4 items-center justify-center">
         <Link href="/login" className="btn-primary" style={{ padding: "0.75rem 2rem" }}>
           Login
         </Link>

@@ -403,12 +403,12 @@ export default function ImportItemsPage() {
   }
 
   return (
-    <div>
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h1 style={{ color: "var(--primary)" }}>Import Items from CSV</h1>
-        <p style={{ color: "var(--text-secondary)" }}>
-          Upload, map columns, review/edit rows, then confirm import.
-        </p>
+    <div className="flex-col gap-6">
+      <div className="dashboard-header" style={{ marginBottom: "1.5rem" }}>
+        <div className="dashboard-header-titles">
+          <h1>Import Items from CSV</h1>
+          <p>Upload, map columns, review/edit rows, then confirm import.</p>
+        </div>
       </div>
 
       <div
@@ -477,8 +477,8 @@ export default function ImportItemsPage() {
               </div>
             )}
 
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem" }}>
-              <Link href="/dashboard/items" className="btn-secondary">
+            <div className="flex-row justify-between gap-4 mt-6" style={{ flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: "1.5rem" }}>
+              <Link href="/dashboard/items" className="btn-secondary" style={{ flex: "1", minWidth: "120px" }}>
                 Cancel
               </Link>
               <button
@@ -486,6 +486,7 @@ export default function ImportItemsPage() {
                 className="btn-primary"
                 onClick={goToMapping}
                 disabled={rows.length === 0}
+                style={{ flex: "1", minWidth: "120px" }}
               >
                 Next
               </button>
@@ -496,8 +497,8 @@ export default function ImportItemsPage() {
         {step === "mapping" && (
           <>
             <div>
-              <h3 style={{ marginBottom: "0.75rem", fontSize: "1rem" }}>Map Columns</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <h3 style={{ marginBottom: "1rem", fontSize: "1.1rem" }}>Map Columns</h3>
+              <div className="form-grid cols-2">
                 {ALL_FIELDS.map((field) => (
                   <div key={field} style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
                     <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>{FIELD_LABELS[field]}</label>
@@ -523,15 +524,21 @@ export default function ImportItemsPage() {
               )}
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem" }}>
+            <div className="flex-row justify-between gap-4 mt-6" style={{ flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: "1.5rem" }}>
               <button
                 type="button"
                 className="btn-secondary"
                 onClick={() => setStep("upload")}
+                style={{ flex: "1", minWidth: "120px" }}
               >
                 Back
               </button>
-              <button type="button" className="btn-primary" onClick={goToReview}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={goToReview}
+                style={{ flex: "1", minWidth: "120px" }}
+              >
                 Next
               </button>
             </div>
@@ -548,13 +555,17 @@ export default function ImportItemsPage() {
               <p style={{ marginBottom: "0.75rem", fontSize: "0.8rem", color: "#92400e" }}>
                 Amber borders indicate a match with existing stock (name/SKU/barcode).
               </p>
-              <div className="table-container" style={{ overflowX: "visible", width: "100%" }}>
-                <table style={{ width: "100%", tableLayout: "fixed" }}>
+              <div className="table-container" style={{ width: "100%" }}>
+                <table style={{ width: "100%", minWidth: "1200px", tableLayout: "fixed" }}>
                   <thead>
                     <tr>
-                      <th style={{ width: 88 }}>Actions</th>
+                      <th style={{ width: "100px" }}>Actions</th>
                       {ALL_FIELDS.map((field) => (
-                        <th key={field} style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+                        <th key={field} style={{ 
+                          width: field === "name" ? "250px" : field === "vendor_id" ? "200px" : "150px",
+                          whiteSpace: "normal", 
+                          wordBreak: "break-word" 
+                        }}>
                           {FIELD_LABELS[field]}
                         </th>
                       ))}
@@ -701,11 +712,12 @@ export default function ImportItemsPage() {
               Valid rows: {reviewValidation.validCount} / {reviewRows.length}
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem" }}>
+            <div className="flex-row justify-between gap-4 mt-6" style={{ flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: "1.5rem" }}>
               <button
                 type="button"
                 className="btn-secondary"
                 onClick={() => setStep("mapping")}
+                style={{ flex: "1", minWidth: "120px" }}
               >
                 Back
               </button>
@@ -718,8 +730,9 @@ export default function ImportItemsPage() {
                   reviewRows.length === 0 ||
                   reviewValidation.validCount !== reviewRows.length
                 }
+                style={{ flex: "1", minWidth: "200px" }}
               >
-                {isImporting ? "Importing..." : "Confirm"}
+                {isImporting ? "Importing..." : "Confirm Import"}
               </button>
             </div>
           </>
@@ -740,11 +753,16 @@ export default function ImportItemsPage() {
               )}
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem" }}>
-              <button type="button" className="btn-secondary" onClick={() => setStep("review")}>
+            <div className="flex-row justify-between gap-4 mt-6" style={{ flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: "1.5rem" }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setStep("review")}
+                style={{ flex: "1", minWidth: "120px" }}
+              >
                 Back
               </button>
-              <Link href="/dashboard/items" className="btn-primary">
+              <Link href="/dashboard/items" className="btn-primary" style={{ flex: "1", minWidth: "120px" }}>
                 Done
               </Link>
             </div>

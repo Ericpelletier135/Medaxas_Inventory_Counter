@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import ItemForm, { type ItemFormValues } from "@/components/ItemForm";
+import Link from "next/link";
+import type { ItemFormValues } from "@/components/ItemForm";
+import dynamic from "next/dynamic";
 import { fetchWithAuth } from "@/lib/api";
+import LoadingView from "@/components/LoadingView";
+
+const ItemForm = dynamic(() => import("@/components/ItemForm"), {
+  loading: () => <LoadingView message="Initializing form utilities..." />
+});
 
 interface ItemRead {
   id: string;
@@ -23,7 +30,7 @@ export default function EditItemPage() {
   const params = useParams<{ id: string }>();
   const itemId = params.id;
 
-  const [initialValues, setInitialValues] = useState<Partial<ItemFormValues> | null>(null);
+  const [initialValues, setInitialValues] = useState<Partial<ItemFormValues> | undefined>(undefined);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -90,42 +97,34 @@ export default function EditItemPage() {
 
   if (loadError) {
     return (
-      <div>
-        <h1 style={{ color: "var(--danger)" }}>Error</h1>
-        <p style={{ color: "var(--text-secondary)", marginTop: "0.5rem" }}>{loadError}</p>
-        <a href="/dashboard/items" className="btn-secondary" style={{ marginTop: "1rem", display: "inline-block" }}>
-          ← Back to Items
-        </a>
+      <div className="flex-col">
+        <h1 className="text-danger">Error</h1>
+        <p className="text-secondary mt-2">{loadError}</p>
+        <div className="mt-4">
+          <Link href="/dashboard/items" className="btn-secondary">
+            ← Back to Items
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (!initialValues) {
-    return <div style={{ color: "var(--text-secondary)" }}>Loading item…</div>;
+    return <LoadingView message="Loading item details..." />;
   }
 
   return (
-    <div>
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ color: "var(--primary)" }}>Edit Item</h1>
-        <p style={{ color: "var(--text-secondary)" }}>
-          Update item details, or use the photo scanner to re-fill fields.
-        </p>
+    <div className="flex-col w-full">
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <h1>Edit Item</h1>
+          <p>Update item details, or use the photo scanner to re-fill fields.</p>
+        </div>
       </div>
 
-      <div className="card">
+      <div className="card w-full">
         {apiError && (
-          <div
-            style={{
-              backgroundColor: "#fee2e2",
-              border: "1px solid #fca5a5",
-              borderRadius: "var(--radius-md)",
-              padding: "0.75rem 1rem",
-              color: "var(--danger)",
-              fontSize: "0.875rem",
-              marginBottom: "1.5rem",
-            }}
-          >
+          <div className="form-error mb-6 p-3" style={{ backgroundColor: "#fee2e2", border: "1px solid #fca5a5", borderRadius: "var(--radius-md)" }}>
             {apiError}
           </div>
         )}

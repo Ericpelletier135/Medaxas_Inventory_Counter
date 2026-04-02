@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchWithAuth } from "@/lib/api";
+import Link from "next/link";
 
 type SalesOrderLine = {
   sales_order_line_id: string;
@@ -40,18 +41,27 @@ export default function SalesOrderDetailPage() {
     loadOrder();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!order) return <div>Order not found.</div>;
+  if (loading) return <div className="text-secondary">Loading...</div>;
+  if (!order) return <div className="text-danger">Order not found.</div>;
 
   return (
-    <div>
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ color: "var(--primary)", marginBottom: "0.5rem" }}>
-          {order.order_number} <span className={`badge badge-${order.status}`} style={{ marginLeft: "1rem" }}>{order.status}</span>
-        </h1>
-        <p style={{ color: "var(--text-secondary)" }}>
-          Date: {order.order_date} | Lines: {order.sales_order_lines.length}
-        </p>
+    <div className="flex-col w-full">
+      
+      <div className="mb-4">
+        <Link href="/dashboard/sales-orders" className="btn-secondary">
+          Back to Sales Orders
+        </Link>
+      </div>
+
+      <div className="dashboard-header mb-8">
+        <div className="dashboard-header-titles">
+          <h1 className="flex-row items-center gap-4">
+            {order.order_number} <span className={`badge badge-${order.status}`}>{order.status}</span>
+          </h1>
+          <p>
+            Date: {order.order_date} | Lines: {order.sales_order_lines.length}
+          </p>
+        </div>
       </div>
 
       <div className="table-container">
@@ -70,11 +80,11 @@ export default function SalesOrderDetailPage() {
               <tr key={line.sales_order_line_id}>
                 <td>
                   <div style={{ fontWeight: 500 }}>{line.item.name}</div>
-                  <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{line.item.sku || "N/A"}</div>
+                  <div className="text-secondary" style={{ fontSize: "0.85rem" }}>{line.item.sku || "N/A"}</div>
                 </td>
-                <td style={{ color: "var(--danger)" }}>{line.current_quantity}</td>
-                <td style={{ color: "var(--text-secondary)" }}>{line.minimum_quantity}</td>
-                <td style={{ fontWeight: 600, color: "var(--primary)" }}>{line.quantity_to_order}</td>
+                <td className="text-danger">{line.current_quantity}</td>
+                <td className="text-secondary">{line.minimum_quantity}</td>
+                <td className="text-primary" style={{ fontWeight: 600 }}>{line.quantity_to_order}</td>
                 <td>{line.unit_of_measure || "-"}</td>
               </tr>
             ))}

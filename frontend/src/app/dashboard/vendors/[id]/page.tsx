@@ -87,19 +87,19 @@ export default function VendorDetailPage() {
   if (!vendor) return <div>Vendor not found.</div>;
 
   return (
-    <div>
-      <div style={{ marginBottom: "1rem" }}>
+    <div className="flex-col">
+      <div className="mb-4">
         <Link href="/dashboard/vendors" className="btn-secondary">
           Back to Vendors
         </Link>
       </div>
 
-      <div className="card" style={{ marginBottom: "1.5rem" }}>
-        <h1 style={{ color: "var(--primary)", marginBottom: "0.35rem" }}>{vendor.vendor_name}</h1>
-        <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>
+      <div className="card mb-6">
+        <h1 className="text-primary mb-2">{vendor.vendor_name}</h1>
+        <p className="text-secondary mb-4">
           Supplier details and linked inventory items.
         </p>
-        <div style={styles.infoGrid}>
+        <div className="form-grid cols-2">
           <div>
             <strong>Contact:</strong> {vendor.contact_name || "-"}
           </div>
@@ -122,9 +122,9 @@ export default function VendorDetailPage() {
       </div>
 
       <div>
-        <div style={{ marginBottom: "0.75rem" }}>
+        <div className="mb-3">
           <h2>Items Supplied</h2>
-          <p style={{ color: "var(--text-secondary)" }}>
+          <p className="text-secondary">
             {vendorItems.length} linked item{vendorItems.length === 1 ? "" : "s"}
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function VendorDetailPage() {
             <tbody>
               {vendorItems.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", color: "var(--text-secondary)" }}>
+                  <td colSpan={7} className="text-center text-secondary">
                     No items are currently linked to this vendor.
                   </td>
                 </tr>
@@ -172,11 +172,3 @@ export default function VendorDetailPage() {
     </div>
   );
 }
-
-const styles = {
-  infoGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "0.8rem",
-  },
-};
